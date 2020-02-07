@@ -91,10 +91,12 @@ this assignment.
                 -864.1778692099259
                 -889.8945591021725
                 -1038.4598658942825
+                
             Akkuantaikku akust"kaavu tanta koai" (Adeodatus = tytttus) eum peyarir.
                 -467.38496726436955
                 -468.74707871865553
                 -400.11254353505404
+
             Sementara itu, Alexios berhasil mengalahkan Pecheneg dalam Pertempuran Levounion pada tanggal 28 April 1091.
                 -769.7228152597905
                 -791.4183842536843
