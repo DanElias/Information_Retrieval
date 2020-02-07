@@ -91,7 +91,7 @@ this assignment.
                 -864.1778692099259
                 -889.8945591021725
                 -1038.4598658942825
-                
+
             Akkuantaikku akust"kaavu tanta koai" (Adeodatus = tytttus) eum peyarir.
                 -467.38496726436955
                 -468.74707871865553
@@ -213,13 +213,6 @@ assignment, because of the following reason:
     On the other hand:
         qaleghqa'mo' jIQuch
     Is correclty predicted as "other" as none of its 4grams appear in any of the LM so its variance is 0
-
-    Maybe the answer to this problem is easier, but I'm having trouble remembering my 
-    Probability and Statistics class as I took it 1.5 yeas ago and we did not learn that much Probability.
-
-    Also I tested 3/4 essay questions, I hope that makes up for the final 5% of accuracy I'm missing :(
-
-    Thank you!
 
 ## References ##
 
