@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+"""
+    Copyright 2020 Daniel Elias Becerra
+    Language Detector, determines if the given sentence is Indonesian
+    Malaysian, Tamil or another Language, based on a created Language Model
+    using character 4-grams
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -11,21 +17,21 @@ import sys
 import getopt
 import re
 import json
+import math
 
 from nltk.util import ngrams
 
-indonesian_LM = dict()
-malaysian_LM = dict()
-tamil_LM = dict()
 
 def build_LM(in_file):
+    indonesian_LM = dict()
+    malaysian_LM = dict()
+    tamil_LM = dict()
+    languages = dict()
     """
     build language models for each label
     each line in in_file contains a label and a string separated by a space
     """
     print('building language models...')
-    # This is an empty method
-    # Pls implement your code in below
 
     #Open the file in read mode and test reading the first line
     #https://stackabuse.com/read-a-file-line-by-line-in-python/
@@ -59,7 +65,7 @@ def build_LM(in_file):
         #5. The next words will be used for the LM, we add [0] as we want all the words, no longer separated
         line_string = line_partitioned[2:][0]
         #6. We generate the character 4 grams and save them into a list
-        ine_string = ' '.join(line_string.split())
+        line_string = ' '.join(line_string.split())
         line_ngrams_list = list(ngrams(
                                 line_string, 
                                 4, 
@@ -98,7 +104,7 @@ def build_LM(in_file):
             count_tamil_LM += len(line_ngrams_list)
 
         line = fd.readline().lower()
-            
+    fd.close()        
     #9. Calculate the probability for each ngram in each LM
     #10. Validate that the product of all the ngram probabilities for each language is 1
     indonesian_probabilities = 0
@@ -116,50 +122,31 @@ def build_LM(in_file):
         tamil_LM[key][1] = pair[0]/(vocabulary_size + count_tamil_LM)
         tamil_probabilities += tamil_LM[key][1]
 
-    with open('indonesian.txt', 'w') as file:
-     file.write(json.dumps(indonesian_LM))
-    with open('malaysian.txt', 'w') as file:
-     file.write(json.dumps(indonesian_LM)) # use `json.loads` to do the reverse
-    with open('tamil.txt', 'w') as file:
-     file.write(json.dumps(indonesian_LM)) # use `json.loads` to do the reverse
-    
-    fd.close()
+    #Finally save the langauge models in a single dictionary
+    languages["indonesian"] = indonesian_LM
+    languages["malaysian"] = malaysian_LM
+    languages["tamil"] = tamil_LM
+    return languages
 
 def test_LM(in_file, out_file, LM):
-    """
-    test the language models on new strings
-    each line of in_file contains a string
-    you should print the most probable label for each string into out_file
-    """
     print("testing language models...")
-    # This is an empty method
-    # Pls implement your code in below
+
+    output_file = open(out_file,"w")
+    output_file.close()
 
     #Open the file in read mode and test reading the first line
-    #https://stackabuse.com/read-a-file-line-by-line-in-python/
     try:
         fd = open(in_file, 'r', encoding="utf8") 
         #1. Read the line make all letters lower case
-        line = fd.readline().lower()
+        line = fd.readline()
     except:
         error_opening_file(in_file)
         fd.close()
         sys.exit(2)
 
-    #https://kite.com/python/docs/nltk.ngrams
-    #https://www.quora.com/How-do-I-remove-punctuation-from-a-Python-string
-    #https://stackoverflow.com/questions/33642522/python-regex-sub-with-multiple-patterns
-    # These variables will be used to count how many ocurrences of ngram occurr in the Language
     while line:
-        #2. Patterns to be deleted from the line = punctuation, special characters, line breaks, digits
-        pattern1 = r'[^\w\s]'
-        pattern2 = r'\n'
-        pattern3 = r'[0-9]'
-        combined_pattern = r'|'.join((pattern1, pattern2, pattern3))
-        line_string = re.sub(combined_pattern,'',line)
-        line_string = ' '.join(line_string.split())
         line_ngrams_list = list(ngrams(
-                                line_string, 
+                                line, 
                                 4, 
                                 pad_left=True, 
                                 pad_right=True, 
@@ -167,17 +154,18 @@ def test_LM(in_file, out_file, LM):
                                 right_pad_symbol='<E>'
                             ))
 
-        probability_indonesian = 1
-        probability_malaysian = 1
-        probability_tamil = 1
+        probability_indonesian = 0
+        probability_malaysian = 0
+        probability_tamil = 0
         for ngram in line_ngrams_list:
             ngram_joined = ''.join(ngram)
 
-            if ngram_joined in indonesian_LM:
-                probability_indonesian *= indonesian_LM.get(ngram_joined)[1]
-                probability_malaysian *= malaysian_LM.get(ngram_joined)[1]
-                probability_tamil *= tamil_LM.get(ngram_joined)[1]
+            if ngram_joined in LM["indonesian"]:
+                probability_indonesian += math.log(LM["indonesian"].get(ngram_joined)[1])
+                probability_malaysian += math.log(LM["malaysian"].get(ngram_joined)[1])
+                probability_tamil += math.log(LM["tamil"].get(ngram_joined)[1])
 
+        print(line)
         print(probability_indonesian)
         print(probability_malaysian)
         print(probability_tamil)
@@ -188,19 +176,23 @@ def test_LM(in_file, out_file, LM):
                 probability_tamil:"tamil"
             }
         winning_probability = probabilities.get(max(probabilities))
-        print(line_string)
-        print("The sentence is: " + winning_probability)
-        print('\n')
+        if(probability_indonesian == 0 and probability_malaysian == 0 and probability_tamil == 0 or "'" in line):
+            winning_probability = "other"
+        output_file = open(out_file,"a")
+        output_file.write(winning_probability + ' ' + line)
 
-        line = fd.readline().lower()
+        line = fd.readline()
     fd.close()
 
+#Usage function
 def usage():
     print("usage: " + sys.argv[0] + " -b input-file-for-building-LM -t input-file-for-testing-LM -o output-file")
 
+#Opening file error function
 def error_opening_file(file):
     print("Error ocurred: could not open file " + file)
 
+#Retrieve the txt arguments and validate them
 input_file_b = input_file_t = output_file = None
 
 try:
@@ -223,9 +215,5 @@ if input_file_b == None or input_file_t == None or output_file == None:
     usage()
     sys.exit(2)
 
-print ('The file works!')
-
-#LM = build_LM(input_file_b)
-build_LM(input_file_b)
-#test_LM(input_file_t, output_file, LM)
-test_LM(input_file_t, output_file, 0)
+LM = build_LM(input_file_b)
+test_LM(input_file_t, output_file, LM)
