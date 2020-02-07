@@ -1,17 +1,17 @@
-== Language Detector ==
+# Language Detector #
 
 This is the README file for A0213170XX's submission
 
-== Python Version ==
+## Python Version ##
 
 I'm using Python Version <3.7.6> for
 this assignment.
 
-== General Notes about this assignment ==
+## General Notes about this assignment ##
 
-build_test_LM.py
+### build_test_LM.py ###
 
-    build_LM(in_file) function
+    #### build_LM(in_file) function ####
 
         This function builds language models for each label
         each line in in_file contains a label and a string separated by a space
@@ -40,7 +40,7 @@ build_test_LM.py
             know if the end the sum of probabilities is one.
         9. Finally I save the language models in a single dictionary and return it
 
-    test_LM(in_file, out_file, LM) function
+    #### test_LM(in_file, out_file, LM) function ####
 
         This function builds test sentences and determines which language they belong to
         Reads the file that contains the lines to be tested.
@@ -62,7 +62,7 @@ build_test_LM.py
             If its zero, then its an alien language "other"
         7. Print to the output file the winning language's name and the original analyzed sentence
 
-    Essay Questions
+## Essay Questions ##
 
     1) In the homework assignment, we are using character-based ngrams, 
     i.e., the gram units are characters. Do you expect token-based ngram models to perform better?
@@ -149,32 +149,32 @@ build_test_LM.py
 
         Really interesting topic! Really liked it!
 
-== Files included with this submission ==
+## Files included with this submission ##
 
-1) input.train.txt
+### 1) input.train.txt ###
     Input file used to build the LMs.
     It contains about 900 lines, where each line is a label/string pair separated by a space. 
     The label will either read malaysian, indonesian, or tamil.
 
-2) input.test.txt
+### 2) input.test.txt ###
     The input file to test the LMs.
     It contains 20 strings, each in a line. 
     Some strings do not belong to any of the three languages the program detects. 
 
-3) input.correct.txt
+### 3) input.correct.txt ###
     Contains the correct labels for the input in input.test.txt, in the same format as input.train.txt 
     (i.e., each label/string pair is separated by a space).
 
-4) build_test_LM.py
+### 4) build_test_LM.py ###
     Is the file described in the last section. The program that creates and uses the LMs
 
-5) input.indonesian.txt
+### 5) input.indonesian.txt ###
     Just as the input.train.txt but with more indonesian samples and less malaysian samples.
 
-6) input.predict.q2.txt
+### 6) input.predict.q2.txt ###
     The results of answering the 2nd Essay Question
 
-== Statement of individual work ==
+## Statement of individual work ##
 
 [x] I, A0213170X, certify that I have followed the CS 3245 Information
 Retrieval class guidelines for homework assignments.  In particular, I
@@ -185,7 +185,7 @@ printed) from the discussions.
 [x] I, A0313170X, did not follow the class rules regarding homework
 assignment, because of the following reason:
 
--- I suggest that I should be graded as follows:
+### I suggest that I should be graded as follows: ###
 
     This is my first time using Python so I would like to not be penalized if I made any mistakes
     or used something in a bad way in my assignment, as I have no prior experience with this language
@@ -219,7 +219,7 @@ assignment, because of the following reason:
 
     Thank you!
 
-== References ==
+## References ##
 
     [1]https://stackabuse.com/read-a-file-line-by-line-in-python/ - Learn how to manipulate files in Python
     [2]https://kite.com/python/docs/nltk.ngrams  -  Learnt about nltk ngrams
