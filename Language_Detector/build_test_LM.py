@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-    Copyright 2020 A0213170X 
+    Copyright 2020 Daniel Elias Becerra
 
     Language Detector, determines if the given sentence is Indonesian
     Malaysian, Tamil or another Language, based on a created Language Model
