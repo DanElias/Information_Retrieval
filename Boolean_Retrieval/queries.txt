@@ -1,0 +1,2 @@
+bill OR Gates AND (vista OR XP) AND NOT mac
+Gates OR bill AND (mac OR vista) AND NOT XP
