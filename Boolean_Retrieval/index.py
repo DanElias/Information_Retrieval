@@ -1,6 +1,6 @@
 '''
 
-    Copyright 2020 Daniel Elias Becerra
+
 
 '''
 
@@ -13,6 +13,7 @@ import os
 import linecache
 import json
 import pickle
+from nltk import stem
 
 def usage():
     print("usage: " + sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file")
@@ -24,10 +25,12 @@ def build_index(in_dir, out_dict, out_postings):
     """
     print('indexing...')
 
+    stemmer = stem.PorterStemmer()
+
     #Dictionary for saving our tokens and the reference to their postings list
     dictionary = dict()
     #Number of files that will be indexed
-    num_files = 100
+    num_files = 1000000
     #1. We have to open the reuters training docs directory and traverse it, opening each doc.
      #List all files in the dir and sort them by numerical order, to have sorted postings lists
     lst = os.listdir(in_dir)
@@ -41,12 +44,21 @@ def build_index(in_dir, out_dict, out_postings):
         text = f.read()
         #Get the sentences in the file
         sentences = nltk.sent_tokenize(text)
+        #This " " token will be used for NOT queries
+        not_postings_list = dictionary.get(" ", list())
+        not_postings_list.append(int(filename))
+        dictionary[" "] = not_postings_list
 
         for sentence in sentences:
             #For each sentence get the words that compose it
             words = nltk.word_tokenize(sentence)
 
             for word in words:
+                
+                word = word.lower()
+                word = stemmer.stem(word)
+                
+
                 #For each word check if its already registered in the dictionary
                 #If its not, a new postings list is created for that word
                 #If its already registered, its postings list is retrieved
@@ -72,11 +84,12 @@ def build_index(in_dir, out_dict, out_postings):
         if(num_files <= 0): 
             break
     
-    with open('ugly_dictionary.txt', 'w') as fp:
-        json.dump(dictionary, fp)
+    #with open('ugly_dictionary.txt', 'w') as fp:
+        #json.dump(dictionary, fp)
     #After checking all the words in the files, we have our dictionary with its postings lists
     # But we don't want to save the postings list with the dictionary as they can be quite large
     # Now we will traverse each word (key) in the dictionary, get its postings list and save it in a different file        
+    
     postings_list_file = open(out_postings, "wb") 
     for word in dictionary:
         postings_list = dictionary[word]

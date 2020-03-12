@@ -1,0 +1,86 @@
+Essay Questions A0213170X
+
+    1) In the homework assignment, we are using character-based ngrams, 
+    i.e., the gram units are characters. Do you expect token-based ngram models to perform better?
+            
+            As we saw on the tutorial character-based ngrams work better for this case as the combinations of characters
+        can be max 26^4, using token-based ngrams would have a probability of (Words in a language)^4 which is way more complex
+         I did not try this experiment because I had no time for it. :(
+
+    2) What do you think will happen if we provided more data for each category for you to build the language 
+    models? What if we only provided more data for Indonesian?
+
+        Hypothesis: The sentences that give Indonesian and Malaysian probabilites really similar will change
+        to have more probability of being Indonesian
+
+        Results: It actually happened the other way around. By adding more examples of indonesian sentences,
+        The program predicted more sentences to be Malaysian. That's because I believe the LM becomes more
+        accurate and it is easier for it to distinguish between Malaysian and Indonesian.
+        Also the word count for Indonesian gets larger and the count is divided by a bigger number,
+        therefore the probability is smaller. Results in the input.indonesian.txt
+    
+    3) What do you think will happen if you strip out punctuations and/or numbers? 
+    What about converting upper case characters to lower case?
+
+        Using raw input:
+            Salah satu anggota keluarga kerajaan dari negara lain seringkali diminta tinggal di Konstantinopel.
+                -864.1778692099259
+                -889.8945591021725
+                -1038.4598658942825
+            Akkuantaikku akust"kaavu tanta koai" (Adeodatus = tytttus) eum peyarir.
+                -467.38496726436955
+                -468.74707871865553
+                -400.11254353505404
+            Sementara itu, Alexios berhasil mengalahkan Pecheneg dalam Pertempuran Levounion pada tanggal 28 April 1091.
+                -769.7228152597905
+                -791.4183842536843
+                -920.9507921021317
+            Accuracy: 90% (because of the "other" sentences)
+        
+        Stripping out punctuations and/or numbers:
+            Salah satu anggota keluarga kerajaan dari negara lain seringkali diminta tinggal di Konstantinopel.
+                -758.3810493808361
+                -770.29026899349
+                -919.0809794631734
+
+            Akkuantaikku akust"kaavu tanta koai" (Adeodatus = tytttus) eum peyarir.
+                -369.22242348803763
+                -370.18287418115085
+                -313.86289347770554
+
+            Sementara itu, Alexios berhasil mengalahkan Pecheneg dalam Pertempuran Levounion pada tanggal 28 April 1091.
+                -529.4119968741463
+                -546.247372896311
+                -660.5643962095112
+
+            Accuracy: 95% (because of the "other" sentences)
+
+            Conclusions:
+                Raw input gives more difference between the final probabilites for each sentence tested with each LM 
+                We can conclude more distinct 4grams are created as a result of having more characters and Upper case letters
+                    Maximum around 70^4 possibilites instead of 26^4
+                Conclusion is punctuation might give the program to distinguish languages better
+                Although, this might not be totally true is we still have characters like digits and maybe '()' That don't matter
+                Also, not removing punctuation affected detecting alien languages as they include the " ' " character
+
+        4) We use 4-gram models in this homework assignment. What do you think will happen if we varied 
+        the ngram size, such as using unigrams, bigrams and trigrams?   
+
+            Let's try!
+
+            With 2grams the accuracy decreases to 75%. Probably because some 2grams like "ti" are repeated across the
+            3 languages
+            With 3 grams the accuracy decreased to 85%. Better than 2grams!
+            With 4 grams the accuracy is 95%! Good!
+            With 5 grams the accuracy is still 95%!
+            With 6 grams the accuracy is still 95%!
+            With 7 grams the accuracy is still 95%!
+            With 8 grams the accuracy is 90%! Oh no started decreasing!
+            With 9 grams the accuracy is 80%! Oh still decreasing!
+            With 10 grams the accuracy is 75%! Ok lets stop here!
+
+            Conclusion is maybe 4 - 7 grams work well as most of the words in those languages are Probably.
+            made up of 4 - 7 characters. Having 9 or 10 character words is strange.
+            Therefore, we must find an optimal ngram model to choose that gives us the best results!
+
+        Really interesting topic! Really liked it!
