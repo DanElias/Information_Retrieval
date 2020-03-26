@@ -1,4 +1,4 @@
-== Language Detector ==
+== Boolean Retrieval ==
 
 This is the README file for A0213170XX's submission
 
