@@ -1,0 +1,199 @@
+This documentation is about the crawling program used to retrieve
+the web pages, their urls, as well as creating the graph that represents
+how the pages are referenced in other pages.
+
+This program can be found in the folder /crawler
+
+INTRODUCTION
+This program was made with the help of a tutorial to create multithreaded python
+program, something that I have never done before. I also learnt about python
+object oriented programming which I had also never done before.
+I made the program on my own with the help of a tutorial.
+Parts that I made without any help of a tutorial are: 
+All things related to creating the graph
+Stopping the crawling process after a max number of pages have been crawled 
+(If it was not stopped we could crawl the whole internet and never end)
+
+My crawling methodology consists in:
+	Starting from a base page: 'https://en.wikipedia.org/wiki/Computer_science'
+	The number of threads in the program can be changed, and the pages retrieved limited
+	The main program starts by creating workers or threads
+	Then the first thread gets a set of links in the base page
+	Then each url retrieved is a new job added to a Queue of jobs
+	Each thread then continues working on retrieving new urls from the current job or url
+	While there are jobs in the queue, the threads continue working
+	Without help, on my own I implemented the part of stopping retrieving not 
+		previously seen urls as we don't want to crawl millions of pages, just about 2000
+	Therefore, when the pages in queue are greater than 2000, the threads continue
+	processing the jobs in the Queue but in a different method which doesn't add
+	new urls to the queue, it just updates the graph with the reamining urls in the Queue
+	to check if one of them references a previously seen page, this creates a much more
+	connected graph more useful for the page rank algorithm.
+	Another part made on my own without any tutorial was creating the directed graph of how the pages are
+	interconnected
+
+main.py
+	- controls all the program
+	- I am working with shared resources which are:
+		a queue.txt with the queue of urls
+		a crawled.txt with the list of crawled urls
+		a graph.pkl with the graph of the connections between pages
+	
+	Functions in main.py
+	
+	create_workers()
+		creates the number of threads specified in the global constant THREADS
+		their target function is work()
+	work()
+		crawls pages while there are still jobs or urls in the Queue
+		When it finishes crawling queue.task_done() is called to remove job from Queue
+		Also I keep track of the total retrieved pages in a global variable
+		queue.txt, graph.pkl, crawled.txt are all updates by the methods called by the Thread
+		Therefore when the pages are greater than 2000, the thread crawls a different method
+			calls Spider.crawl_page_graph()
+		When pages are less than 2000, the thread continues adding new urls to Queue
+			calls Spider.crawl_page()
+		I will talk about the Spider class later on this document
+	crawl()
+		Obtains the queue in queue.txt and checks its length
+		If it had a length greater than one then it creates jobs create_jobs()
+		updates the total_retrieved_pages which is equal to the total_in_queue_file + total_crawled
+		
+	create_jobs()
+		gets the queue in queue.txt and then adds jobs to the Queue
+		Here I added to check if the jobs added are not grater than
+		a max_jobs constant, this is so that the Queue used by the threads
+		always has a reasonable amount of jobs, cause
+		if it has thousands of jobs then the threads would continue
+		crawling thousands and thousands of pages until they finish with
+		all the jobs
+		Therefore, I just give few jobs for the threads to work on
+		So when they finish I can update and check total_retrieved_pages
+		So when the I once again add more jobs the threads will check  total_retrieved_pages
+		and decide which method they will call as I explained in work() function
+
+
+spider.py
+	
+	- This is the actual crawler who examines pages
+	- It reads and writes to queue.txt, graph.pkl and crawled.txt
+		with various functions stated in utils.py
+	
+	- This is a class: Spider
+	
+	
+	
+	__init__(self, project_name, base_url, domain_name)
+		- project_name is only a folder name to where the shared files will
+			be stored
+		- base_url the current url
+		- domain_name: to check that we are still in Wikipedia 
+			and not a random page in the Internet
+		initializes instance variables and class specific variables (static variables)
+		I use static variables as the Threads need them to have the same value
+			no matter the spider object used by the Thread
+		calls function boot()
+		calss function crawl_page()
+
+	@staticmethod
+	boot()
+		creates the necessary shared resources: queue.txt, crawled.txt etc...
+		adds the first page to the graph
+		I will talk about the graph later on but
+		each url is a vertex in the graph
+
+	@staticmethod
+	crawl_page()
+		Remember this is called when we still havent retrieved more than 2000 pages
+		we gather links in web page with function gather_links()
+		then we add those retrieved links to the queue function add_links_to_queue()
+		then we add those links as vertices and edges to the graph function  function add_vertices_edges_to_graph
+		then we remove current page from queue and add to crawled list
+		the we updates the shared resources files
+	
+	@staticmethod
+	crawl_page_graph()
+		Remember this is called when we have retrieved more than 2000 pages
+		In contrast to crawl_page() this function only
+		updates the graph if one of the gathered urls
+		in the web page is already in the crawled or queue lists
+		Then if it appears we add that edge to the graph
+	
+	@staticmethod
+	gather_links()
+		opens the url with urlopen and gets the html content as string
+		send this content to a class called LinkFinder() to find the links in the html
+		I don't use Beutiful Soup to find links
+		returns links found
+		I will explain more about the LinkFinder class later
+	
+	@staticmethod
+    	def add_links_to_queue():
+		Checks first that the link hasnt appeared already
+		in the queue or crawled
+		Then checks if the link still corresponds to a domain
+		uses get_domain_name(url) in the file domain.py
+		
+		**domain.py
+			get_domain_name(url)
+				Checks we are still in wikipedia.com
+				Also that we are in English part of wikipedia
+				And also that the page is an articles
+				and no other kind of wikipedia page
+	@staticmethod
+    	def add_edges_to_graph():
+		Update the remaining links in the page to check if one of them 
+    		references a page in the crawled or queued lists
+    		It no longer adds unseen links to queue (boundary)
+	
+	@staticmethod
+    	def add_vertices_edges_to_graph():
+		In contrast to add_edges_to_graph() this function
+		also adds new vertices to the graph no matter if we haven´t
+		seen them in the queue or crawled files
+	
+	@staticmethod
+    	def update_files()
+		updates shared resources and files with functions
+		in utils.py
+		
+	**utils.py
+		Just has functions to read, write, pickle, objects, files, folders
+	
+link_finder.py
+	
+	- Has class LinkFinder which extends HTMLParser
+		it searches for tag 'a' with handle_starttag()
+		and gets the links
+
+graph.py
+	
+	- The implementation of a class Vertex and class Graph
+	- This graph is implemented using Adjancency matrix
+	- with a weight of 1 for edges between A to B vertices
+	- It is directed graph so the matrix is not simetrical
+	by the diagonal
+	Also chose adjancency matrix as the page rank needs the matrix A
+
+test_graph.py
+	Was just a file to check the graph had been saved correclty
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
